@@ -173,7 +173,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  mopro_flutter: 84fe118c7cc2507b1e3baaadeaef2df214adbbc9
+  mopro_flutter: 584c5d3c09b680eec2c24ddf496ee4b4d5ba7083
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
