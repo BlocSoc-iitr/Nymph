@@ -396,9 +396,11 @@ dependencies = [
 
 [[package]]
 name = "bb"
-version = "0.1.0"
-source = "git+https://github.com/zkmopro/noir-rs#2be26fb0a4a11586692f35ed8ef22039da709c9b"
+version = "0.82.2"
+source = "git+https://github.com/zkmopro/noir-rs?branch=v1.0.0-beta.3-2#35027e6238cd8651bffd99567228062e9cc1e216"
 dependencies = [
+ "cc",
+ "chkstk_stub",
  "num-bigint",
  "thiserror 1.0.69",
  "tracing",
@@ -599,6 +601,15 @@ name = "cfg_aliases"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
+
+[[package]]
+name = "chkstk_stub"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "047f6ab2f3b9bcaf23b593d1580898e4244d27eadf1a1fae99212ee5735d3d1c"
+dependencies = [
+ "cc",
+]
 
 [[package]]
 name = "chrono"
@@ -1898,7 +1909,7 @@ dependencies = [
 [[package]]
 name = "mopro-ffi"
 version = "0.2.0"
-source = "git+https://github.com/zkmopro/mopro.git#b0c623cc2173057d4f52907d7ee6eaab218f1888"
+source = "git+https://github.com/zkmopro/mopro.git?branch=v0.2.x#30218b111c74b3b4d7aef4253f9add7ec4965364"
 dependencies = [
  "anyhow",
  "camino",
@@ -1907,6 +1918,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.12",
+ "toml 0.8.22",
  "uniffi",
  "uuid",
 ]
@@ -1986,13 +1998,14 @@ dependencies = [
 
 [[package]]
 name = "noir"
-version = "0.1.0"
-source = "git+https://github.com/zkmopro/noir-rs#2be26fb0a4a11586692f35ed8ef22039da709c9b"
+version = "1.0.0-beta.3-2"
+source = "git+https://github.com/zkmopro/noir-rs?branch=v1.0.0-beta.3-2#35027e6238cd8651bffd99567228062e9cc1e216"
 dependencies = [
  "acir",
  "acvm",
  "acvm_blackbox_solver",
  "base64 0.22.1",
+ "base64ct",
  "bb",
  "bincode",
  "bn254_blackbox_solver",
@@ -2001,6 +2014,7 @@ dependencies = [
  "hex",
  "nargo",
  "openssl",
+ "proptest",
  "reqwest",
  "serde",
  "serde_json",
@@ -2435,8 +2449,16 @@ dependencies = [
  "rand_chacha 0.3.1",
  "rand_xorshift",
  "regex-syntax",
+ "rusty-fork",
+ "tempfile",
  "unarray",
 ]
+
+[[package]]
+name = "quick-error"
+version = "1.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quinn"
@@ -2862,6 +2884,18 @@ name = "rustversion"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eded382c5f5f786b989652c49544c4877d9f015cc22e145a5ea8ea66c2921cd2"
+
+[[package]]
+name = "rusty-fork"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb3dcc6e454c328bb824492db107ab7c0ae8fcffe4ad210136ef014458c1bc4f"
+dependencies = [
+ "fnv",
+ "quick-error",
+ "tempfile",
+ "wait-timeout",
+]
 
 [[package]]
 name = "ryu"
@@ -3628,7 +3662,19 @@ dependencies = [
  "serde",
  "serde_spanned",
  "toml_datetime",
- "toml_edit",
+ "toml_edit 0.19.15",
+]
+
+[[package]]
+name = "toml"
+version = "0.8.22"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05ae329d1f08c4d17a59bed7ff5b5a769d062e64a62d34a3261b219e62cd5aae"
+dependencies = [
+ "serde",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_edit 0.22.26",
 ]
 
 [[package]]
@@ -3650,8 +3696,28 @@ dependencies = [
  "serde",
  "serde_spanned",
  "toml_datetime",
- "winnow",
+ "winnow 0.5.40",
 ]
+
+[[package]]
+name = "toml_edit"
+version = "0.22.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "310068873db2c5b3e7659d2cc35d21855dbafa50d1ce336397c666e3cb08137e"
+dependencies = [
+ "indexmap 2.9.0",
+ "serde",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_write",
+ "winnow 0.7.13",
+]
+
+[[package]]
+name = "toml_write"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 
 [[package]]
 name = "tower"
@@ -3976,6 +4042,15 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "wait-timeout"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09ac3b126d3914f9849036f826e054cbabdc8519970b8998ddaf3b5bd3c65f11"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "walkdir"
@@ -4390,6 +4465,15 @@ name = "winnow"
 version = "0.5.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f593a95398737aeed53e489c785df13f3618e41dbcd6718c6addbf1395aa6876"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
+name = "winnow"
+version = "0.7.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21a0236b59786fed61e2a80582dd500fe61f18b5dca67a4a067d0bc9039339cf"
 dependencies = [
  "memchr",
 ]

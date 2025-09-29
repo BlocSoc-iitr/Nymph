@@ -1,11 +1,9 @@
+build_mode = "release"
 target_adapters = []
-target_platforms = ["ios"]
+target_platforms = ["android"]
 ios = [
-    "x86_64-apple-ios",
     "aarch64-apple-ios",
     "aarch64-apple-ios-sim",
+    "x86_64-apple-ios",
 ]
-android = [
-    "aarch64-linux-android",
-    "x86_64-linux-android",
-]
+android = ["aarch64-linux-android"]

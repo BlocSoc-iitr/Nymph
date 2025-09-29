@@ -44,7 +44,9 @@ Mopro simplifies generating native mobile bindings through the mopro CLI. The fo
 
 ### Install Mopro CLI
 
-Follow the [Getting Started](https://zkmopro.org/docs/getting-started) page to install `mopro` CLI.
+```sh
+cargo install mopro-cli@0.1.0
+```
 
 ### iOS
 

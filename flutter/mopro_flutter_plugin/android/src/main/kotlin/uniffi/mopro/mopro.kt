@@ -774,6 +774,8 @@ internal interface IntegrityCheckingUniffiLib : Library {
 
     fun uniffi_mopro_bindings_checksum_func_generate_noir_proof(): Short
 
+    fun uniffi_mopro_bindings_checksum_func_get_noir_verification_key(): Short
+
     fun uniffi_mopro_bindings_checksum_func_post_likes(): Short
 
     fun uniffi_mopro_bindings_checksum_func_prove(): Short
@@ -802,7 +804,7 @@ internal interface IntegrityCheckingUniffiLib : Library {
 internal interface UniffiLib : Library {
     companion object {
         internal val INSTANCE: UniffiLib by lazy {
-            val componentName = "mopro"
+            val componentName = "mopro_bindings"
             // For large crates we prevent `MethodTooLargeException` (see #2340)
             // N.B. the name of the extension is very misleading, since it is
             // rather `InterfaceTooLargeException`, caused by too many methods
@@ -862,6 +864,17 @@ internal interface UniffiLib : Library {
         `circuitPath`: RustBuffer.ByValue,
         `srsPath`: RustBuffer.ByValue,
         `inputs`: RustBuffer.ByValue,
+        `onChain`: Byte,
+        `vk`: RustBuffer.ByValue,
+        `lowMemoryMode`: Byte,
+        uniffi_out_err: UniffiRustCallStatus,
+    ): RustBuffer.ByValue
+
+    fun uniffi_mopro_bindings_fn_func_get_noir_verification_key(
+        `circuitPath`: RustBuffer.ByValue,
+        `srsPath`: RustBuffer.ByValue,
+        `onChain`: Byte,
+        `lowMemoryMode`: Byte,
         uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
 
@@ -930,6 +943,9 @@ internal interface UniffiLib : Library {
     fun uniffi_mopro_bindings_fn_func_verify_noir_proof(
         `circuitPath`: RustBuffer.ByValue,
         `proof`: RustBuffer.ByValue,
+        `onChain`: Byte,
+        `vk`: RustBuffer.ByValue,
+        `lowMemoryMode`: Byte,
         uniffi_out_err: UniffiRustCallStatus,
     ): Byte
 
@@ -1180,7 +1196,10 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_mopro_bindings_checksum_func_generate_halo2_proof() != 28088.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_mopro_bindings_checksum_func_generate_noir_proof() != 8268.toShort()) {
+    if (lib.uniffi_mopro_bindings_checksum_func_generate_noir_proof() != 10178.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_mopro_bindings_checksum_func_get_noir_verification_key() != 48549.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_mopro_bindings_checksum_func_post_likes() != 39054.toShort()) {
@@ -1207,7 +1226,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_mopro_bindings_checksum_func_verify_jwt_proof() != 17725.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_mopro_bindings_checksum_func_verify_noir_proof() != 57242.toShort()) {
+    if (lib.uniffi_mopro_bindings_checksum_func_verify_noir_proof() != 62250.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_mopro_bindings_checksum_func_verify_zkemail() != 8016.toShort()) {
@@ -2138,6 +2157,9 @@ fun `generateNoirProof`(
     `circuitPath`: kotlin.String,
     `srsPath`: kotlin.String?,
     `inputs`: List<kotlin.String>,
+    `onChain`: kotlin.Boolean,
+    `vk`: kotlin.ByteArray,
+    `lowMemoryMode`: kotlin.Boolean,
 ): kotlin.ByteArray =
     FfiConverterByteArray.lift(
         uniffiRustCallWithError(MoproException) { _status ->
@@ -2145,6 +2167,28 @@ fun `generateNoirProof`(
                 FfiConverterString.lower(`circuitPath`),
                 FfiConverterOptionalString.lower(`srsPath`),
                 FfiConverterSequenceString.lower(`inputs`),
+                FfiConverterBoolean.lower(`onChain`),
+                FfiConverterByteArray.lower(`vk`),
+                FfiConverterBoolean.lower(`lowMemoryMode`),
+                _status,
+            )
+        },
+    )
+
+@Throws(MoproException::class)
+fun `getNoirVerificationKey`(
+    `circuitPath`: kotlin.String,
+    `srsPath`: kotlin.String?,
+    `onChain`: kotlin.Boolean,
+    `lowMemoryMode`: kotlin.Boolean,
+): kotlin.ByteArray =
+    FfiConverterByteArray.lift(
+        uniffiRustCallWithError(MoproException) { _status ->
+            UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_get_noir_verification_key(
+                FfiConverterString.lower(`circuitPath`),
+                FfiConverterOptionalString.lower(`srsPath`),
+                FfiConverterBoolean.lower(`onChain`),
+                FfiConverterBoolean.lower(`lowMemoryMode`),
                 _status,
             )
         },
@@ -2299,12 +2343,18 @@ fun `verifyJwtProof`(
 fun `verifyNoirProof`(
     `circuitPath`: kotlin.String,
     `proof`: kotlin.ByteArray,
+    `onChain`: kotlin.Boolean,
+    `vk`: kotlin.ByteArray,
+    `lowMemoryMode`: kotlin.Boolean,
 ): kotlin.Boolean =
     FfiConverterBoolean.lift(
         uniffiRustCallWithError(MoproException) { _status ->
             UniffiLib.INSTANCE.uniffi_mopro_bindings_fn_func_verify_noir_proof(
                 FfiConverterString.lower(`circuitPath`),
                 FfiConverterByteArray.lower(`proof`),
+                FfiConverterBoolean.lower(`onChain`),
+                FfiConverterByteArray.lower(`vk`),
+                FfiConverterBoolean.lower(`lowMemoryMode`),
                 _status,
             )
         },
