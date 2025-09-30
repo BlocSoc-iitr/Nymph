@@ -12,7 +12,7 @@ import '../firebase_options.dart';
 import '../services/auth_service.dart';
 import '../services/create_membershipt.dart';
 import '../services/create_message.dart';
-import '../services/fetch_googleJWTpubKey.dart';
+import '../services/fetch_googleJWTPubkey.dart';
 import '../services/generate_ephemeral_key.dart';
 import '../services/google_jwt_prover.dart';
 import '../services/jwt_prover.dart';
