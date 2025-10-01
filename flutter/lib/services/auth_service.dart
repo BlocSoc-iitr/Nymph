@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 
-import 'fetch_googleJWTpubKey.dart';
+import 'fetch_googleJWTPubkey.dart';
 import 'generate_ephemeral_key.dart';
 import 'google_jwt_prover.dart';
 

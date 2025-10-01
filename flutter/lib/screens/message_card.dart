@@ -7,7 +7,7 @@ import 'package:mopro_flutter/mopro_flutter_platform_interface.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../services/fetch_messages.dart';
-import '../services/fetch_googleJWTpubKey.dart';
+import '../services/fetch_googleJWTPubkey.dart';
 import '../services/toggle_like.dart';
 
 class Message {
