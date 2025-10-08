@@ -9,6 +9,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../services/fetch_messages.dart';
 import '../services/fetch_googleJWTPubkey.dart';
 import '../services/toggle_like.dart';
+import '../theme/theme.dart';
 
 class Message {
   final String id;
@@ -156,71 +157,348 @@ class _MessageCardState extends State<MessageCard> {
       print("Error verifying proof: $e");
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+    return Container(
+      margin: EdgeInsets.only(bottom: AppSpacing.base),
+      decoration: BoxDecoration(
+        color: AppColors.cardElevated,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppSpacing.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header row with org and time
             Row(
               children: [
-                Image.network(
-                  "https://img.logo.dev/${widget.msg.org}?token=pk_SqdEexoxR3akcyJz7PneXg",
-                  width: 24,
-                  height: 24,
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceCard,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    border: Border.all(
+                      color: AppColors.primaryCyan.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    child: Image.network(
+                      "https://img.logo.dev/${widget.msg.org}?token=pk_SqdEexoxR3akcyJz7PneXg",
+                      width: 32,
+                      height: 32,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.business,
+                        size: 16,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(child: Text('Someone from ${widget.msg.org}')),
-                Text(timeago.format(widget.msg.time)),
+                SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Someone from ${widget.msg.org}',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        timeago.format(widget.msg.time),
+                        style: AppTextStyles.small.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Verification badge
+                if (_verified != null)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs / 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _verified!
+                          ? AppColors.success.withOpacity(0.1)
+                          : AppColors.error.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                      border: Border.all(
+                        color: _verified!
+                            ? AppColors.success.withOpacity(0.3)
+                            : AppColors.error.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _verified! ? Icons.verified : Icons.error_outline,
+                          size: 12,
+                          color: _verified! ? AppColors.success : AppColors.error,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          _verified! ? 'Verified' : 'Failed',
+                          style: AppTextStyles.small.copyWith(
+                            color: _verified! ? AppColors.success : AppColors.error,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
-            const SizedBox(height: 12),
-            MarkdownBody(data: widget.msg.body),
-            const SizedBox(height: 8),
+            SizedBox(height: AppSpacing.md),
+            
+            // Message body
+            MarkdownBody(
+              data: widget.msg.body,
+              styleSheet: MarkdownStyleSheet(
+                p: AppTextStyles.body,
+                a: AppTextStyles.body.copyWith(
+                  color: AppColors.primaryCyan,
+                  decoration: TextDecoration.underline,
+                ),
+                code: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
+                  backgroundColor: AppColors.surfaceCard,
+                ),
+                img: AppTextStyles.body,
+              ),
+              imageBuilder: (uri, title, alt) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      uri.toString(),
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceCard,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.primaryCyan,
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Loading image...',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 120,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceCard,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.primaryCyan.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.broken_image_outlined,
+                                  color: AppColors.textSecondary,
+                                  size: 32,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  alt ?? 'Failed to load image',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                if (title != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    title,
+                                    style: AppTextStyles.small.copyWith(
+                                      color: AppColors.textTertiary,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: AppSpacing.md),
+            
+            // Divider
+            Container(
+              height: 1,
+              color: Colors.white.withOpacity(0.05),
+            ),
+            SizedBox(height: AppSpacing.md),
+            
+            // Footer with actions
             Row(
               children: [
-                IconButton(
-                  onPressed: () async {
-                    if (widget.msg.isLiked == 0) {
-                      await toggleLike(widget.msg.id, true);
-                      setState(() {
-                        widget.msg.likes++;
-                        widget.msg.isLiked = 1;
-                      });
-                    } else {
-                      await toggleLike(widget.msg.id, false);
-                      setState(() {
-                        widget.msg.likes--;
-                        widget.msg.isLiked = 0;
-                      });
-                    }
-                  },
-                  icon: Icon(widget.msg.isLiked == 1 ? Icons.thumb_up : Icons.thumb_up_alt_outlined, size: 16),
+                // Like button
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    onTap: () async {
+                      if (widget.msg.isLiked == 0) {
+                        await toggleLike(widget.msg.id, true);
+                        setState(() {
+                          widget.msg.likes++;
+                          widget.msg.isLiked = 1;
+                        });
+                      } else {
+                        await toggleLike(widget.msg.id, false);
+                        setState(() {
+                          widget.msg.likes--;
+                          widget.msg.isLiked = 0;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            widget.msg.isLiked == 1
+                                ? Icons.thumb_up
+                                : Icons.thumb_up_outlined,
+                            size: 18,
+                            color: widget.msg.isLiked == 1
+                                ? AppColors.primaryCyan
+                                : AppColors.textSecondary,
+                          ),
+                          SizedBox(width: AppSpacing.xs),
+                          Text(
+                            widget.msg.likes.toString(),
+                            style: AppTextStyles.caption.copyWith(
+                              color: widget.msg.isLiked == 1
+                                  ? AppColors.primaryCyan
+                                  : AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 4),
-                Text(widget.msg.likes.toString()),
                 const Spacer(),
-                if (_verified != null)
-                  Text(_verified! ? '✅ Verified' : '❌ Not verified')
-                else
-                  TextButton(
+                
+                // Verify button
+                if (_verified == null)
+                  ElevatedButton(
                     onPressed: _isLoading
                         ? null
                         : () => _callVerifyJwtProof(
                               widget.msg.id,
                               widget.msg.internal,
                             ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.surfaceCard,
+                      foregroundColor: AppColors.primaryCyan,
+                      elevation: 0,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.base,
+                        vertical: AppSpacing.xs,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      ),
+                    ),
                     child: _isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primaryCyan,
+                            ),
                           )
-                        : const Text('Verify'),
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.shield_outlined, size: 16),
+                              SizedBox(width: AppSpacing.xs),
+                              Text(
+                                'Verify',
+                                style: AppTextStyles.caption.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
               ],
             ),

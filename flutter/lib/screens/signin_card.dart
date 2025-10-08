@@ -16,6 +16,7 @@ import '../services/fetch_googleJWTPubkey.dart';
 import '../services/generate_ephemeral_key.dart';
 import '../services/google_jwt_prover.dart';
 import '../services/jwt_prover.dart';
+import '../theme/theme.dart';
 
 class SignInCard extends StatefulWidget {
   final VoidCallback onPostSuccess;
@@ -144,26 +145,85 @@ class _SignInCardState extends State<SignInCard> {
   String sliceEmail(dynamic email) {
     return email.substring(email.indexOf('@') + 1);
   }
-
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cardElevated,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(
+          color: AppColors.primaryCyan.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppSpacing.cardPadding),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MarkdownAutoPreview(
-              controller: _textController,
-              emojiConvert: true,
-              decoration: InputDecoration(
-                hintText: "What's happening at your company?",
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-              ),
-              maxLines: 5,
-              minLines: 3,
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(AppSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryCyan.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  ),
+                  child: Icon(
+                    Icons.edit_note,
+                    color: AppColors.primaryCyan,
+                    size: 20,
+                  ),
+                ),
+                SizedBox(width: AppSpacing.md),
+                Text(
+                  'Create a Post',
+                  style: AppTextStyles.h3.copyWith(fontSize: 16),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppSpacing.base),
+            
+            // Markdown editor
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceCard,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.05),
+                  width: 1,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(AppSpacing.md),
+                child: MarkdownAutoPreview(
+                  controller: _textController,
+                  emojiConvert: true,
+                  decoration: InputDecoration(
+                    hintText: "What's happening at your company?",
+                    hintStyle: AppTextStyles.body.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  style: AppTextStyles.body,
+                  maxLines: 5,
+                  minLines: 3,
+                ),
+              ),
+            ),
+            SizedBox(height: AppSpacing.base),
+            
+            // Auth section
             StreamBuilder<User?>(
               stream: _authService.authStateChanges,
               builder: (context, snapshot) {
@@ -171,108 +231,175 @@ class _SignInCardState extends State<SignInCard> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Posting as \"Someone from ${sliceEmail(snapshot.data!.email)}\"",
-                              style: TextStyle(fontSize: 16),
+                      Container(
+                        padding: EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceCard,
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          border: Border.all(
+                            color: AppColors.primaryCyan.withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.person_outline,
+                              color: AppColors.primaryCyan,
+                              size: 18,
                             ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.refresh),
-                            onPressed: () async {
-                              await _authService.signOut();
-                              await _signInWithGoogle();
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () async {
-                              await _authService.signOut();
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Access the text when the post button is pressed
-                              final text = _textController.text;
-                              if (text.isNotEmpty) {
-                                createMessage(
-                                  text,
-                                  sliceEmail(snapshot.data!.email),
-                                  widget.isInternal, // internal
-                                ).then((_) {
-                                  _textController
-                                      .clear(); // Clear the text field after posting
-                                  widget
-                                      .onPostSuccess(); // Call the callback after successful post
-                                });
-                              }
-                            },
-                            child: Text('Post'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF3730A3),
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
+                            SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Text(
+                                'Posting as "Someone from ${sliceEmail(snapshot.data!.email)}"',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.refresh,
+                                color: AppColors.textSecondary,
+                                size: 20,
+                              ),
+                              onPressed: () async {
+                                await _authService.signOut();
+                                await _signInWithGoogle();
+                              },
+                              tooltip: 'Refresh',
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.close,
+                                color: AppColors.textSecondary,
+                                size: 20,
+                              ),
+                              onPressed: () async {
+                                await _authService.signOut();
+                              },
+                              tooltip: 'Sign out',
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.md),
+                      ElevatedButton(
+                        onPressed: () {
+                          final text = _textController.text;
+                          if (text.isNotEmpty) {
+                            createMessage(
+                              text,
+                              sliceEmail(snapshot.data!.email),
+                              widget.isInternal,
+                            ).then((_) {
+                              _textController.clear();
+                              widget.onPostSuccess();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Posted successfully!'),
+                                  backgroundColor: AppColors.success,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryCyan,
+                          foregroundColor: Colors.black,
+                          padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                           ),
-                        ],
+                          elevation: 2,
+                          shadowColor: AppColors.primaryCyan.withOpacity(0.3),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send, size: 18),
+                            SizedBox(width: AppSpacing.sm),
+                            Text(
+                              'Post Message',
+                              style: AppTextStyles.buttonPrimary,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   );
                 } else {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Sign in with your Google work account to anonymously post as "Someone from your company".',
-                          style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            fontSize: 14,
-                          ),
-                        ),
+                  return Container(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceCard,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(
+                        color: AppColors.primaryCyan.withOpacity(0.2),
+                        width: 1,
                       ),
-                      const SizedBox(width: 8),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: _signInWithGoogle,
-                          child: Container(
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Sign in to post',
+                                style: AppTextStyles.bodyMedium,
+                              ),
+                              SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Use your Google work account to post anonymously',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.textTertiary,
                                 ),
-                              ],
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Image.asset(
-                              'assets/google.png',
-                              width: 36,
-                              height: 36,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: AppSpacing.md),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                            onTap: _isLoading ? null : _signInWithGoogle,
+                            child: Container(
+                              padding: EdgeInsets.all(AppSpacing.sm),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: _isLoading
+                                  ? SizedBox(
+                                      width: 36,
+                                      height: 36,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primaryCyan,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      'assets/google.png',
+                                      width: 36,
+                                      height: 36,
+                                    ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 }
-                return const SizedBox.shrink();
               },
             ),
           ],
