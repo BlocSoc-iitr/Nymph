@@ -13,6 +13,8 @@ import 'services/fetch_messages.dart';
 import 'services/jwt_prover.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
+import 'theme/theme.dart';
+import 'theme/app_colors.dart';
 
 void main() async {
   // Initialize Flutter binding
@@ -29,12 +31,7 @@ class StealthNoteApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'StealthNote',
-      theme: ThemeData(
-        fontFamily: GoogleFonts.inter().fontFamily,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF1A1A1A),
-      ),
+      theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
@@ -62,6 +59,7 @@ class _StealthHomePageState extends State<StealthHomePage> {
   bool _isLoadingMore = false;
   bool _hasMoreMessages = true;
   DateTime? _oldestMessageTime;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -177,6 +175,89 @@ class _StealthHomePageState extends State<StealthHomePage> {
     }
   }
 
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+      if (index == 0) {
+        isInternal = false;
+      } else if (index == 1) {
+        isInternal = true;
+      }
+      messages = [];
+      _oldestMessageTime = null;
+      _hasMoreMessages = true;
+    });
+    _loadMessages();
+  }
+
+  Future<void> _showLogoutDialog() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.cardBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          'Sign Out',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimaryColor,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to sign out?',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: AppColors.textSecondaryColor,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondaryColor,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Sign Out',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirm == true) {
+      await _authService.signOut();
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/signin',
+          (route) => false,
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
@@ -187,226 +268,62 @@ class _StealthHomePageState extends State<StealthHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
-      drawer: Drawer(
-        backgroundColor: const Color(0xFF252525),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF5CE5E5).withOpacity(0.1),
-                    const Color(0xFF252525),
-                  ],
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF5CE5E5),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: const Icon(
-                      Icons.security,
-                      color: Colors.black,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text('StealthNote',
-                      style: GoogleFonts.inter(
-                        fontSize: 24, 
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      )),
-                  Text('Anonymous messaging',
-                      style: GoogleFonts.inter(
-                        fontSize: 14, 
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFFB8B8B8),
-                      )),
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: !isInternal ? const Color(0xFF5CE5E5).withOpacity(0.1) : null,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                leading: Icon(
-                  Icons.home_outlined,
-                  color: !isInternal ? const Color(0xFF5CE5E5) : const Color(0xFFB8B8B8),
-                ),
-                title: Text('Home',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: !isInternal ? const Color(0xFF5CE5E5) : Colors.white,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    isInternal = false;
-                    messages = [];
-                    _oldestMessageTime = null;
-                    _hasMoreMessages = true;
-                  });
-                  _loadMessages();
-                },
-              ),
-            ),
-            if (_user != null) ...[
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isInternal ? const Color(0xFF5CE5E5).withOpacity(0.1) : null,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.business_outlined,
-                    color: isInternal ? const Color(0xFF5CE5E5) : const Color(0xFFB8B8B8),
-                  ),
-                  title: Text('${sliceEmail(_user!.email)} Internal',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isInternal ? const Color(0xFF5CE5E5) : Colors.white,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      isInternal = true;
-                      messages = [];
-                      _oldestMessageTime = null;
-                      _hasMoreMessages = true;
-                    });
-                    _loadMessages();
-                  },
-                ),
-              ),
-            ],
-            const Divider(
-              color: Color(0xFF808080),
-              thickness: 0.5,
-              height: 32,
-              indent: 12,
-              endIndent: 12,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                leading: const Icon(
-                  Icons.logout,
-                  color: Color(0xFFFF5252),
-                ),
-                title: Text('Sign Out',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFFFF5252),
-                  ),
-                ),
-                onTap: () async {
-                  Navigator.pop(context);
-                  // Show confirmation dialog
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: const Color(0xFF252525),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      title: Text(
-                        'Sign Out',
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      content: Text(
-                        'Are you sure you want to sign out?',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFFB8B8B8),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: Text(
-                            'Cancel',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFFB8B8B8),
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF5252),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            'Sign Out',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                  
-                  if (confirm == true) {
-                    await _authService.signOut();
-                    if (mounted) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/signin',
-                        (route) => false,
-                      );
-                    }
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text('StealthNote', style: GoogleFonts.inter(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColors.textPrimaryColor,
         )),
-        backgroundColor: const Color(0xFF1A1A1A),
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.backgroundColor,
+        foregroundColor: AppColors.textPrimaryColor,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: _showLogoutDialog,
+          tooltip: 'Sign Out',
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'Create Post',
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () async {
+              await showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: AppColors.backgroundColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (context) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                        child: SignInCard(
+                          isInternal: isInternal,
+                          onPostSuccess: () {
+                            Navigator.of(context).maybePop();
+                            setState(() {
+                              messages = [];
+                              _oldestMessageTime = null;
+                              _hasMoreMessages = true;
+                            });
+                            _loadMessages();
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: GestureDetector(
         onTap: () {
@@ -425,20 +342,9 @@ class _StealthHomePageState extends State<StealthHomePage> {
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
             children: [
-              SignInCard(
-                isInternal: isInternal,
-                onPostSuccess: () {
-                  setState(() {
-                    messages = [];
-                    _oldestMessageTime = null;
-                    _hasMoreMessages = true;
-                  });
-                  _loadMessages();
-                },
-              ),
-              const SizedBox(height: 24),
+              // Composer moved to a modal opened by the top-right + button
               ...messages.map((msg) => Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
+                padding: const EdgeInsets.only(bottom: 8.0),
                 child: MessageCard(msg, key: ValueKey('${msg.id}_$_messageKey')),
               )).toList(),
               if (_isLoadingMore)
@@ -452,7 +358,7 @@ class _StealthHomePageState extends State<StealthHomePage> {
                           height: 32,
                           child: CircularProgressIndicator(
                             strokeWidth: 3,
-                            color: const Color(0xFF5CE5E5),
+                            color: AppColors.accentColor,
                             backgroundColor: const Color(0xFF5CE5E5).withOpacity(0.1),
                           ),
                         ),
@@ -462,7 +368,7 @@ class _StealthHomePageState extends State<StealthHomePage> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: const Color(0xFFB8B8B8),
+                            color: AppColors.textSecondaryColor,
                           ),
                         ),
                       ],
@@ -503,7 +409,7 @@ class _StealthHomePageState extends State<StealthHomePage> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: const Color(0xFFB8B8B8),
+                            color: AppColors.textSecondaryColor,
                           ),
                         ),
                       ],
@@ -513,6 +419,25 @@ class _StealthHomePageState extends State<StealthHomePage> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        backgroundColor: AppColors.cardBackgroundColor,
+        selectedItemColor: AppColors.accentColor,
+        unselectedItemColor: AppColors.textSecondaryColor,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(_currentIndex == 0 ? Icons.home : Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(_currentIndex == 1 ? Icons.business : Icons.business_outlined),
+            label: _user != null ? '${sliceEmail(_user!.email)} Internal' : 'Internal',
+          ),
+        ],
       ),
     );
   }

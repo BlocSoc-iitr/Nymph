@@ -8,6 +8,7 @@ import '../services/fetch_googleJWTPubkey.dart';
 import '../services/generate_ephemeral_key.dart';
 import '../services/google_jwt_prover.dart';
 import '../services/jwt_prover.dart';
+import '../theme/app_colors.dart';
 
 class GoogleSignInScreen extends StatefulWidget {
   const GoogleSignInScreen({Key? key}) : super(key: key);
@@ -97,7 +98,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Signed in as: $userEmail'),
-              backgroundColor: const Color(0xFF4CAF50),
+              backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -111,7 +112,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Sign-in canceled'),
-              backgroundColor: const Color(0xFFFFC107),
+              backgroundColor: AppColors.warning,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -150,7 +151,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Sign-in error: ${e.toString()}'),
-            backgroundColor: const Color(0xFFFF5252),
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -172,15 +173,15 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppColors.backgroundColor,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF1A1A1A),
-              const Color(0xFF252525).withOpacity(0.3),
+              AppColors.backgroundColor,
+              AppColors.cardBackgroundColor.withOpacity(0.3),
             ],
           ),
         ),
@@ -203,11 +204,11 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF5CE5E5),
+                          color: AppColors.accentColor,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF5CE5E5).withOpacity(0.3),
+                              color: AppColors.accentColor.withOpacity(0.3),
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
@@ -242,7 +243,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFFB8B8B8),
+                        color: AppColors.textSecondaryColor,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -255,7 +256,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFF808080),
+                        color: AppColors.textTertiary,
                         height: 1.5,
                       ),
                     ),
@@ -292,7 +293,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                                 width: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  color: Color(0xFF5CE5E5),
+                                  color: AppColors.accentColor,
                                 ),
                               )
                             : Row(
@@ -325,7 +326,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                         color: Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFF5CE5E5).withOpacity(0.2),
+                          color: AppColors.accentColor.withOpacity(0.2),
                           width: 1,
                         ),
                       ),
@@ -333,7 +334,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                         children: [
                           Icon(
                             Icons.lock_outline,
-                            color: const Color(0xFF5CE5E5),
+                            color: AppColors.accentColor,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
@@ -343,7 +344,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFFB8B8B8),
+                                color: AppColors.textSecondaryColor,
                                 height: 1.4,
                               ),
                             ),

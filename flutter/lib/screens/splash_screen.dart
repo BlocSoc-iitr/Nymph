@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
+import '../theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -58,15 +59,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppColors.backgroundColor,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF1A1A1A),
-              const Color(0xFF252525).withOpacity(0.5),
+              AppColors.backgroundColor,
+              AppColors.cardBackgroundColor.withOpacity(0.5),
             ],
           ),
         ),
@@ -86,11 +87,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF5CE5E5),
+                          color: AppColors.accentColor,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF5CE5E5).withOpacity(0.3),
+                              color: AppColors.accentColor.withOpacity(0.3),
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
@@ -122,7 +123,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          color: const Color(0xFFB8B8B8),
+                          color: AppColors.textSecondaryColor,
                           letterSpacing: 1,
                         ),
                       ),
@@ -134,8 +135,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         height: 40,
                         child: CircularProgressIndicator(
                           strokeWidth: 3,
-                          color: const Color(0xFF5CE5E5),
-                          backgroundColor: const Color(0xFF5CE5E5).withOpacity(0.1),
+                          color: AppColors.accentColor,
+                          backgroundColor: AppColors.accentColor.withOpacity(0.1),
                         ),
                       ),
                     ],

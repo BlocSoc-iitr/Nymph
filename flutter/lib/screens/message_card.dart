@@ -185,25 +185,27 @@ class _MessageCardState extends State<MessageCard> {
             Row(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.surfaceCard,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: AppColors.primaryCyan.withOpacity(0.2),
+                      color: AppColors.accentColor.withOpacity(0.2),
                       width: 1,
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      "https://img.logo.dev/${widget.msg.org}?token=pk_SqdEexoxR3akcyJz7PneXg",
-                      width: 32,
-                      height: 32,
+                      // Deterministic anonymous avatar per org using DiceBear
+                      "https://api.dicebear.com/7.x/bottts/png?seed=${Uri.encodeComponent(widget.msg.org)}&backgroundType=gradientLinear&size=80",
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.business,
-                        size: 16,
+                        Icons.person,
+                        size: 20,
                         color: AppColors.textTertiary,
                       ),
                     ),
@@ -217,7 +219,7 @@ class _MessageCardState extends State<MessageCard> {
                       Text(
                         'Someone from ${widget.msg.org}',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
+                          color: AppColors.textPrimaryColor,
                         ),
                       ),
                       SizedBox(height: 2),
@@ -279,11 +281,11 @@ class _MessageCardState extends State<MessageCard> {
               styleSheet: MarkdownStyleSheet(
                 p: AppTextStyles.body,
                 a: AppTextStyles.body.copyWith(
-                  color: AppColors.primaryCyan,
+                  color: AppColors.accentColor,
                   decoration: TextDecoration.underline,
                 ),
                 code: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.textSecondaryColor,
                   backgroundColor: AppColors.surfaceCard,
                 ),
                 img: AppTextStyles.body,
@@ -323,7 +325,7 @@ class _MessageCardState extends State<MessageCard> {
                                   height: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: AppColors.primaryCyan,
+                                    color: AppColors.accentColor,
                                     value: loadingProgress.expectedTotalBytes != null
                                         ? loadingProgress.cumulativeBytesLoaded /
                                             loadingProgress.expectedTotalBytes!
@@ -334,7 +336,7 @@ class _MessageCardState extends State<MessageCard> {
                                 Text(
                                   'Loading image...',
                                   style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: AppColors.textSecondaryColor,
                                   ),
                                 ),
                               ],
@@ -349,7 +351,7 @@ class _MessageCardState extends State<MessageCard> {
                             color: AppColors.surfaceCard,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: AppColors.primaryCyan.withOpacity(0.2),
+                              color: AppColors.accentColor.withOpacity(0.2),
                               width: 1,
                             ),
                           ),
@@ -359,14 +361,14 @@ class _MessageCardState extends State<MessageCard> {
                               children: [
                                 Icon(
                                   Icons.broken_image_outlined,
-                                  color: AppColors.textSecondary,
+                                  color: AppColors.textSecondaryColor,
                                   size: 32,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   alt ?? 'Failed to load image',
                                   style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: AppColors.textSecondaryColor,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -436,16 +438,16 @@ class _MessageCardState extends State<MessageCard> {
                                 : Icons.thumb_up_outlined,
                             size: 18,
                             color: widget.msg.isLiked == 1
-                                ? AppColors.primaryCyan
-                                : AppColors.textSecondary,
+                                ? AppColors.accentColor
+                                : AppColors.textSecondaryColor,
                           ),
                           SizedBox(width: AppSpacing.xs),
                           Text(
                             widget.msg.likes.toString(),
                             style: AppTextStyles.caption.copyWith(
                               color: widget.msg.isLiked == 1
-                                  ? AppColors.primaryCyan
-                                  : AppColors.textSecondary,
+                                  ? AppColors.accentColor
+                                  : AppColors.textSecondaryColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -467,7 +469,7 @@ class _MessageCardState extends State<MessageCard> {
                             ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.surfaceCard,
-                      foregroundColor: AppColors.primaryCyan,
+                      foregroundColor: AppColors.accentColor,
                       elevation: 0,
                       padding: EdgeInsets.symmetric(
                         horizontal: AppSpacing.base,
@@ -483,7 +485,7 @@ class _MessageCardState extends State<MessageCard> {
                             height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppColors.primaryCyan,
+                              color: AppColors.accentColor,
                             ),
                           )
                         : Row(

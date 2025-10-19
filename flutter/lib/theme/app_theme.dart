@@ -10,19 +10,19 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.backgroundDark,
+      scaffoldBackgroundColor: AppColors.backgroundColor,
       
       // Color scheme
       colorScheme: ColorScheme.dark(
-        primary: AppColors.primaryCyan,
-        secondary: AppColors.primaryCyan,
+        primary: AppColors.accentColor,
+        secondary: AppColors.accentColor,
         surface: AppColors.cardElevated,
-        background: AppColors.backgroundDark,
+        background: AppColors.backgroundColor,
         error: const Color(0xFFFF5252),
         onPrimary: Colors.black,
         onSecondary: Colors.black,
-        onSurface: AppColors.textPrimary,
-        onBackground: AppColors.textPrimary,
+        onSurface: AppColors.textPrimaryColor,
+        onBackground: AppColors.textPrimaryColor,
       ),
 
       // App Bar Theme
@@ -30,7 +30,7 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.textPrimary),
+        iconTheme: IconThemeData(color: AppColors.textPrimaryColor),
         titleTextStyle: AppTextStyles.h2,
       ),      // Card Theme
       cardTheme: CardThemeData(
@@ -56,7 +56,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primaryCyan, width: 2),
+          borderSide: BorderSide(color: AppColors.accentColor, width: 2),
         ),
         hintStyle: AppTextStyles.body.copyWith(color: AppColors.textTertiary),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -65,7 +65,7 @@ class AppTheme {
       // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryCyan,
+          backgroundColor: AppColors.accentColor,
           foregroundColor: Colors.black,
           textStyle: AppTextStyles.buttonPrimary,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -73,7 +73,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(999), // pill shape
           ),
           elevation: 2,
-          shadowColor: AppColors.primaryCyan.withOpacity(0.3),
+          shadowColor: AppColors.accentColor.withOpacity(0.3),
           minimumSize: const Size(140, 48),
         ),
       ),
@@ -81,7 +81,7 @@ class AppTheme {
       // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
+          foregroundColor: AppColors.textPrimaryColor,
           textStyle: AppTextStyles.bodyMedium,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
@@ -89,9 +89,9 @@ class AppTheme {
 
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColors.backgroundDarker,
-        selectedItemColor: AppColors.primaryCyan,
-        unselectedItemColor: AppColors.textSecondary,
+        backgroundColor: AppColors.cardBackgroundColor,
+        selectedItemColor: AppColors.accentColor,
+        unselectedItemColor: AppColors.textSecondaryColor,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
         selectedLabelStyle: AppTextStyles.small.copyWith(fontWeight: FontWeight.w600),

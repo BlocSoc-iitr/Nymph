@@ -152,7 +152,7 @@ class _SignInCardState extends State<SignInCard> {
         color: AppColors.cardElevated,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border: Border.all(
-          color: AppColors.primaryCyan.withOpacity(0.2),
+          color: AppColors.accentColor.withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -174,12 +174,12 @@ class _SignInCardState extends State<SignInCard> {
                 Container(
                   padding: EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryCyan.withOpacity(0.1),
+                    color: AppColors.accentColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   ),
                   child: Icon(
                     Icons.edit_note,
-                    color: AppColors.primaryCyan,
+                    color: AppColors.accentColor,
                     size: 20,
                   ),
                 ),
@@ -237,7 +237,7 @@ class _SignInCardState extends State<SignInCard> {
                           color: AppColors.surfaceCard,
                           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                           border: Border.all(
-                            color: AppColors.primaryCyan.withOpacity(0.2),
+                            color: AppColors.accentColor.withOpacity(0.2),
                             width: 1,
                           ),
                         ),
@@ -245,7 +245,7 @@ class _SignInCardState extends State<SignInCard> {
                           children: [
                             Icon(
                               Icons.person_outline,
-                              color: AppColors.primaryCyan,
+                              color: AppColors.accentColor,
                               size: 18,
                             ),
                             SizedBox(width: AppSpacing.sm),
@@ -253,14 +253,14 @@ class _SignInCardState extends State<SignInCard> {
                               child: Text(
                                 'Posting as "Someone from ${sliceEmail(snapshot.data!.email)}"',
                                 style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.textSecondary,
+                                  color: AppColors.textSecondaryColor,
                                 ),
                               ),
                             ),
                             IconButton(
                               icon: Icon(
                                 Icons.refresh,
-                                color: AppColors.textSecondary,
+                                color: AppColors.textSecondaryColor,
                                 size: 20,
                               ),
                               onPressed: () async {
@@ -272,7 +272,7 @@ class _SignInCardState extends State<SignInCard> {
                             IconButton(
                               icon: Icon(
                                 Icons.close,
-                                color: AppColors.textSecondary,
+                                color: AppColors.textSecondaryColor,
                                 size: 20,
                               ),
                               onPressed: () async {
@@ -306,14 +306,14 @@ class _SignInCardState extends State<SignInCard> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryCyan,
+                          backgroundColor: AppColors.accentColor,
                           foregroundColor: Colors.black,
                           padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                           ),
                           elevation: 2,
-                          shadowColor: AppColors.primaryCyan.withOpacity(0.3),
+                          shadowColor: AppColors.accentColor.withOpacity(0.3),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -336,7 +336,7 @@ class _SignInCardState extends State<SignInCard> {
                       color: AppColors.surfaceCard,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       border: Border.all(
-                        color: AppColors.primaryCyan.withOpacity(0.2),
+                        color: AppColors.accentColor.withOpacity(0.2),
                         width: 1,
                       ),
                     ),
@@ -385,7 +385,7 @@ class _SignInCardState extends State<SignInCard> {
                                       height: 36,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: AppColors.primaryCyan,
+                                        color: AppColors.accentColor,
                                       ),
                                     )
                                   : Image.asset(

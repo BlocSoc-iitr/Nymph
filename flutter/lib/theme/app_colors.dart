@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Colors
-  static const Color primaryCyan = Color(0xFF5CE5E5);
-  static const Color primaryCyanDark = Color(0xFF4DD4D4);
+  static const Color accentColor = Color(0xFF00D4FF);
+  static const Color accentColorDark = Color(0xFF00B8D4);
 
   // Background Colors
-  static const Color backgroundDark = Color(0xFF1A1A1A);
-  static const Color backgroundDarker = Color(0xFF0F0F0F);
+  static const Color backgroundColor = Color(0xFF0A0A0A);
+  static const Color cardBackgroundColor = Color(0xFF1A1A1A);
   static const Color cardElevated = Color(0xFF252525);
 
   // Text Colors
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFB8B8B8);
+  static const Color textPrimaryColor = Color(0xFFFFFFFF);
+  static const Color textSecondaryColor = Color(0xFF888888);
   static const Color textTertiary = Color(0xFF808080);
   static const Color textGreeting = Color(0xFFC0C0C0);
+
+  // Border Colors
+  static const Color borderColor = Color(0xFF333333);
+
   // Surface Colors
   static final Color surfaceCard = Colors.white.withOpacity(0.05);
   static final Color surfaceCardHover = Colors.white.withOpacity(0.08);
@@ -25,6 +29,7 @@ class AppColors {
   static const Color warning = Color(0xFFFFC107);
   static const Color error = Color(0xFFFF5252);
   static const Color info = Color(0xFF2196F3);
+
   // Gradient Overlays
   static final LinearGradient imageOverlay = LinearGradient(
     begin: Alignment.topCenter,

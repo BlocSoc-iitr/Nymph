@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../main.dart';
 import 'google_signin_screen.dart';
+import '../theme/app_colors.dart';
 
 class AuthCheckScreen extends StatelessWidget {
   final AuthService _authService = AuthService();
@@ -17,10 +18,10 @@ class AuthCheckScreen extends StatelessWidget {
         // Show loading while checking auth state
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF1A1A1A),
+            backgroundColor: AppColors.backgroundColor,
             body: Center(
               child: CircularProgressIndicator(
-                color: Color(0xFF5CE5E5),
+                color: AppColors.accentColor,
               ),
             ),
           );
