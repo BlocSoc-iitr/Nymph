@@ -1,140 +1,125 @@
-# Stealthnote Mobile
+# 🔐 Nymph - Anonymous Messaging Revolution
 
-<p align="center">
-<a href="https://testflight.apple.com/join/8hqYwe8C"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-alt="Demo of the Nextcloud iOS files app"
-height="40"></a>
-<a href="https://drive.google.com/file/d/1IMsH0fBpaLGkFgFX0oqnlS6LQk3WCr3t/view?usp=sharing"><img src="https://i.imgur.com/kct14sr.png"
-alt="Demo of the Nextcloud iOS files app"
-height="40"></a>
-</p>
+<div align="center">
 
-This project is inspired by [stealthnote.xyz](https://stealthnote.xyz). Our goal is to build on the core idea of StealthNote while significantly enhancing performance and user experience using [Mopro](https://zkmopro.org). By leveraging native execution, our implementation achieves at least **~10×** faster performance compared to the browser-based version — as demonstrated in our [benchmarks](#-benchmarks).
+*Where privacy meets performance in the world of anonymous communication*
 
-## 📺 Demo video
+</div>
 
-[![Watch the video](https://img.youtube.com/vi/ngUAfYgLj0M/maxresdefault.jpg)](https://www.youtube.com/watch?v=ngUAfYgLj0Ms)
+---
 
-## 🎯 Features
+## What is Nymph?
 
--   **Sign in with Google OAuth**: When a user signs in with Google on StealthNote, an ephemeral key is generated. The platform then requests a JWT from Google OAuth to prove ownership of the user's email address, using the hash of the ephemeral key as a nonce. A Noir proof is generated to attest to the validity of the JWT and the nonce, and this proof is submitted to the server. Upon verification, the server creates a membership record tied to the user's organizational email.
+Nymph is a **next-generation anonymous messaging platform** that combines the power of **zero-knowledge proofs** with **blazing-fast native performance**. Think of it as your organization's private, anonymous social network where thoughts flow freely without identity concerns.
 
--   **Create note**: After signing in with Google OAuth and storing the ephemeral key, users can use the key to post content on the platform.
+---
 
--   **Toggle likes**: Just like creating a note, users can use their ephemeral public key to toggle likes on the platform.
+## 🚀 Key Features
 
--   **Verify proofs**: Each message box includes a "Verify" button, allowing any user to verify the corresponding Noir proof stored in the database and confirm its authenticity via Google OAuth.
+### 🔑 **Zero-Knowledge Authentication**
+- **Google OAuth Integration**: Seamless sign-in with your work account
+- **Ephemeral Key Generation**: Temporary keys for maximum security
+- **JWT Proof Generation**: Cryptographic proof of identity without revealing it
 
--   **Internal chat**: Internal chats are visible only to members of the same organization who choose to post internally. Stealthnote uses the user's ephemeral public key to authenticate message posting and retrieval.
+### 💬 **Anonymous Messaging**
+- **Organization-Based Anonymity**: Post as "Someone from [YourOrg]"
+- **Internal Channels**: Private discussions within your organization
+- **Public Feed**: Share thoughts with the broader community
+- **Markdown Support**: Rich text formatting for expressive communication
 
-## 💻 How it is made?
+### ⚡ **Lightning-Fast Performance**
+- **Native Execution**: Rust-powered cryptographic operations
+- **Cross-Platform**: iOS and Android with shared codebase
+- **Optimized Proofs**: Sub-second verification times
 
--   **Rust:** All cryptographic functions are implemented in Rust, as the ecosystem offers a richer set of libraries and better performance compared to Flutter. Below is an overview of our implementation.
+### 🛡️ **Advanced Security**
+- **Proof Verification**: Anyone can verify message authenticity
+- **Like System**: Anonymous engagement with cryptographic backing
+- **Ephemeral Keys**: Temporary authentication for enhanced privacy
+- **Organizational Isolation**: Seperate internal communication channels
 
-    -   `generate_ephemeral_key()`: Stealthnote uses an ephemeral key for performing actions and verifying membership. We implemented Ed25519 signature functionality and hashes in Rust to ensure secure and efficient cryptographic operations.
-    -   `prove_jwt()`: The `prove_jwt` function extracts the necessary data for the Noir circuit and invokes the [noir-rs](https://github.com/zkmopro/noir-rs) proof generation function to produce a valid Noir proof.
-    -   `verify_jwt_proof()`: The `verify_jwt_proof` function retrieves inputs from the database, formats them for the Noir circuit, and uses noir-rs to verify the corresponding proof.
+---
 
--   **Mopro:** Mopro generates native bindings for iOS and Android, allowing the Flutter app to call Rust-defined functions simply by replacing the generated bindings.
--   **Flutter:** Flutter is used to build our cross-platform frontend. It handles the Google authentication flow to obtain a JWT, and communicates with the Stealthnote.xyz APIs to interact with the backend.
+## 🛠️ Development Setup
 
-## 🔧 Build the Bindings
+### Prerequisites
+- **Rust** (latest stable)
+- **Flutter** (3.0+)
+- **Mopro CLI** (0.1.0)
+- **iOS/Android** development environment
 
-Mopro simplifies generating native mobile bindings through the mopro CLI. The following example demonstrates how to update the bindings when changes are made to the underlying [Rust functions](./src/lib.rs). This allows developers to focus solely on maintaining the Rust functions, while automatically ensuring cross-platform support.
+### Quick Start
 
-### Install Mopro CLI
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Blocsoc-iitr/Nymph.git
+   cd Nymph
+   ```
 
-```sh
-cargo install mopro-cli@0.1.0
+2. **Install Mopro CLI**
+   ```bash
+   cargo install mopro-cli@0.1.0
+   ```
+
+3. **Build Native Bindings (if not already)**
+   ```bash
+   # For iOS
+   mopro build  # Select: aarch64-apple-ios
+   
+   # For Android (enable android-compat in Cargo.toml first)
+   mopro build  # Select: aarch64-linux-android
+   ```
+
+4. **Update Flutter Bindings**
+   ```bash
+   cp -r MoproiOSBindings flutter/mopro_flutter_plugin/ios && \
+   cp -r MoproAndroidBindings/uniffi flutter/mopro_flutter_plugin/android/src/main/kotlin && \
+   cp -r MoproAndroidBindings/jniLibs flutter/mopro_flutter_plugin/android/src/main
+   ```
+
+5. **Run the App**
+   ```bash
+   cd flutter
+   flutter pub get
+   flutter run
+   ```
+
+### 🔧 Configuration
+
+#### Android Compatibility
+Enable Android support in `Cargo.toml`:
+```toml
+noir = { git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"] }
 ```
 
-### iOS
+#### Firebase Setup
+1. Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS)
+2. Configure Firebase Authentication
+3. Set up your project's Firebase console
 
-Run
+---
 
-```sh
-mopro build
-```
+## 🔐 Security & Privacy
 
-and select `aarch64-apple-ios`
+### Zero-Knowledge Architecture
+- **No Identity Storage**: Your real identity is never stored
+- **Ephemeral Keys**: Temporary authentication keys that expire
+- **Proof-Based Verification**: Cryptographic proof of membership
+- **Organizational Isolation**: Secure internal communication channels
 
-### Android
+### Data Protection
+- **End-to-End Encryption**: All messages are encrypted in transit
+- **No Metadata Collection**: We don't track your usage patterns
+- **Local Key Management**: Keys stored securely on your device
+- **Automatic Cleanup**: Ephemeral data is automatically purged
 
-Activate `android-compat` feature in [Cargo.toml](./Cargo.toml).
+---
 
-```diff
-- noir = { git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg"] }
-+ noir = { git = "https://github.com/zkmopro/noir-rs", features = ["barretenberg", "android-compat"] }
-```
+<div align="center">
 
-Run
+*Empowering anonymous communication through zero-knowledge technology*
 
-```sh
-mopro build
-```
+[![GitHub stars](https://img.shields.io/github/stars/blocsoc-iitr/nymph?style=social)](https://github.com/blocsoc-iitr/Nymph)
+[![Twitter Follow](https://img.shields.io/twitter/follow/blocSocIITR?style=social)](https://twitter.com/blocSocIITR)
 
-and select `aarch64-linux-android`
-
-## 🔄 Manually Update Bindings
-
-### Flutter
-
-Copy the generated files into your Flutter project:
-
-```sh
-cp -r MoproiOSBindings flutter/mopro_flutter_plugin/ios && \
-cp -r MoproAndroidBindings/uniffi flutter/mopro_flutter_plugin/android/src/main/kotlin && \
-cp -r MoproAndroidBindings/jniLibs flutter/mopro_flutter_plugin/android/src/main
-```
-
-## 📂 Open the project
-
-Follow the instructions to open the development tools
-
-### Flutter
-
--   Go to `flutter` directory
-
-    ```sh
-    cd flutter
-    ```
-
--   Check flutter environment
-
-    ```sh
-    flutter doctor
-    ```
-
--   Install Flutter Dependencies
-
-    ```sh
-    flutter pub get
-    ```
-
--   Run the app (Please turn on emulators before running the command)
-    ```sh
-    flutter run
-    ```
-
-## Markdown Support
-
-Stealthnote Mobile supports a variety of Markdown features for rich text formatting in your notes. You can use common Markdown syntax to create headers, lists, bold and italic text, links, and more.
-
-Below is an example of how Markdown is rendered in the app:
-
-<p align="center">
- <a href="https://i.imgur.com/vcfzPmT.png"><img src="https://i.imgur.com/vcfzPmT.png" alt="Markdown Example" width="300"/></a>
-    <br>
-    <em>Stealthnote Mobile Support Markdown</em>
-</p>
-
-## 📊 Benchmarks
-
-The following benchmarks were conducted on iPhone and Android in release mode:
-
-| JWT Operation              | Prove    | Verify  |
-| -------------------------- | -------- | ------- |
-| Browser                    | 37.292 s | 0.286 s |
-| Desktop (Mac M1 Pro)       | 2.02 s   | 0.007 s |
-| Android emulator (Pixel 8) | 4.786 s  | 3.013 s |
-| iPhone 16 Pro              | 2.626 s  | 1.727 s |
+</div>
