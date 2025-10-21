@@ -30,7 +30,7 @@ class StealthNoteApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'StealthNote',
+      title: 'Nymph',
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
@@ -270,7 +270,7 @@ class _StealthHomePageState extends State<StealthHomePage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text('StealthNote', style: GoogleFonts.inter(
+        title: Text('Nymph', style: GoogleFonts.inter(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimaryColor,

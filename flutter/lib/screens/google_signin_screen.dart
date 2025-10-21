@@ -225,7 +225,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                     
                     // App Name
                     Text(
-                      'STEALTHNOTE',
+                      'Nymph',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 32,
