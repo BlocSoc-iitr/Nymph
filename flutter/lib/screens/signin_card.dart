@@ -35,6 +35,8 @@ class _SignInCardState extends State<SignInCard> {
   final moproFlutterPlugin = MoproFlutter();
   bool _isLoading = false;
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController();
+  bool _showImageInput = false;
 
   @override
   void initState() {
@@ -44,6 +46,7 @@ class _SignInCardState extends State<SignInCard> {
   @override
   void dispose() {
     _textController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -82,7 +85,7 @@ class _SignInCardState extends State<SignInCard> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Signed in as: $userEmail'),
+              content: Text('Signed in successfully'),
               backgroundColor: Colors.green,
             ),
           );
@@ -147,263 +150,383 @@ class _SignInCardState extends State<SignInCard> {
   }
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final cardHeight = screenHeight * 0.45; 
+    
     return Container(
+      height: cardHeight,
       decoration: BoxDecoration(
         color: AppColors.cardElevated,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.accentColor.withOpacity(0.2),
+          color: AppColors.accentColor.withOpacity(0.15),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacing.cardPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header - Compact
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, 16, 20, 12),
+            child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(AppSpacing.sm),
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.accentColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    color: AppColors.accentColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     Icons.edit_note,
                     color: AppColors.accentColor,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
-                SizedBox(width: AppSpacing.md),
+                SizedBox(width: 12),
                 Text(
-                  'Create a Post',
-                  style: AppTextStyles.h3.copyWith(fontSize: 16),
+                  'Create Post',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                Spacer(),
+                // Add Image Button
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      setState(() {
+                        _showImageInput = !_showImageInput;
+                        if (!_showImageInput) {
+                          _imageUrlController.clear();
+                        }
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _showImageInput 
+                            ? AppColors.accentColor.withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        Icons.image_outlined,
+                        size: 20,
+                        color: _showImageInput 
+                            ? AppColors.accentColor 
+                            : AppColors.textSecondaryColor,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: AppSpacing.base),
-            
-            // Markdown editor
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceCard,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.05),
-                  width: 1,
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.md),
-                child: MarkdownAutoPreview(
-                  controller: _textController,
-                  emojiConvert: true,
-                  decoration: InputDecoration(
-                    hintText: "What's happening at your company?",
-                    hintStyle: AppTextStyles.body.copyWith(
-                      color: AppColors.textTertiary,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  style: AppTextStyles.body,
-                  maxLines: 5,
-                  minLines: 3,
-                ),
-              ),
-            ),
-            SizedBox(height: AppSpacing.base),
-            
-            // Auth section
-            StreamBuilder<User?>(
-              stream: _authService.authStateChanges,
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data != null) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceCard,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(
-                            color: AppColors.accentColor.withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.person_outline,
-                              color: AppColors.accentColor,
-                              size: 18,
-                            ),
-                            SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Text(
-                                'Posting as "Someone from ${sliceEmail(snapshot.data!.email)}"',
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.textSecondaryColor,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.refresh,
-                                color: AppColors.textSecondaryColor,
-                                size: 20,
-                              ),
-                              onPressed: () async {
-                                await _authService.signOut();
-                                await _signInWithGoogle();
-                              },
-                              tooltip: 'Refresh',
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.close,
-                                color: AppColors.textSecondaryColor,
-                                size: 20,
-                              ),
-                              onPressed: () async {
-                                await _authService.signOut();
-                              },
-                              tooltip: 'Sign out',
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      ElevatedButton(
-                        onPressed: () {
-                          final text = _textController.text;
-                          if (text.isNotEmpty) {
-                            createMessage(
-                              text,
-                              sliceEmail(snapshot.data!.email),
-                              widget.isInternal,
-                            ).then((_) {
-                              _textController.clear();
-                              widget.onPostSuccess();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Posted successfully!'),
-                                  backgroundColor: AppColors.success,
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
-                            });
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.accentColor,
-                          foregroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                          ),
-                          elevation: 2,
-                          shadowColor: AppColors.accentColor.withOpacity(0.3),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.send, size: 18),
-                            SizedBox(width: AppSpacing.sm),
-                            Text(
-                              'Post Message',
-                              style: AppTextStyles.buttonPrimary,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Container(
-                    padding: EdgeInsets.all(AppSpacing.md),
+          ),
+          
+          // Content Area - Flexible
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text Input - Compact
+                  Container(
                     decoration: BoxDecoration(
                       color: AppColors.surfaceCard,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.accentColor.withOpacity(0.2),
+                        color: Colors.white.withOpacity(0.08),
                         width: 1,
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Sign in to post',
-                                style: AppTextStyles.bodyMedium,
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: MarkdownAutoPreview(
+                        controller: _textController,
+                        emojiConvert: true,
+                        decoration: InputDecoration(
+                          hintText: widget.isInternal 
+                              ? "Share something with your team..."
+                              : "What's happening in the world?",
+                          hintStyle: AppTextStyles.body.copyWith(
+                            color: AppColors.textTertiary,
+                            fontSize: 15,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: AppTextStyles.body.copyWith(fontSize: 15),
+                        maxLines: 4,
+                        minLines: 2,
+                      ),
+                    ),
+                  ),
+                  
+                  // Image URL Input - Conditional
+                  if (_showImageInput) ...[
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceCard,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.accentColor.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: TextField(
+                          controller: _imageUrlController,
+                          style: AppTextStyles.body.copyWith(fontSize: 14),
+                          decoration: InputDecoration(
+                            hintText: "Paste image URL here...",
+                            hintStyle: AppTextStyles.body.copyWith(
+                              color: AppColors.textTertiary,
+                              fontSize: 14,
+                            ),
+                            border: InputBorder.none,
+                            prefixIcon: Icon(
+                              Icons.link,
+                              color: AppColors.accentColor,
+                              size: 18,
+                            ),
+                          ),
+                          onChanged: (value) {
+                            if (value.isNotEmpty && _textController.text.isEmpty) {
+                              // Auto-insert image markdown if text is empty
+                              _textController.text = "![Image]($value)";
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                  
+                  Spacer(),
+                  
+                  // Auth Section - StreamBuilder
+                  StreamBuilder<User?>(
+                    stream: _authService.authStateChanges,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Column(
+                          children: [
+                            // User Info - Minimal
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceCard,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.accentColor.withOpacity(0.2),
+                                  width: 1,
+                                ),
                               ),
-                              SizedBox(height: AppSpacing.xs),
-                              Text(
-                                'Use your Google work account to post anonymously',
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.textTertiary,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.accentColor.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.person_outline,
+                                      color: AppColors.accentColor,
+                                      size: 14,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      '${sliceEmail(snapshot.data!.email)}',
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: AppColors.textSecondaryColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(16),
+                                      onTap: () async {
+                                        await _authService.signOut();
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.all(4),
+                                        child: Icon(
+                                          Icons.close,
+                                          color: AppColors.textSecondaryColor,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            
+                            // Post Button - Prominent
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  final text = _textController.text;
+                                  if (text.isNotEmpty) {
+                                    createMessage(
+                                      text,
+                                      sliceEmail(snapshot.data!.email),
+                                      widget.isInternal,
+                                    ).then((_) {
+                                      _textController.clear();
+                                      _imageUrlController.clear();
+                                      setState(() {
+                                        _showImageInput = false;
+                                      });
+                                      widget.onPostSuccess();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Posted successfully!'),
+                                          backgroundColor: AppColors.success,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      );
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.accentColor,
+                                  foregroundColor: Colors.black,
+                                  padding: EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.send, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Post',
+                                      style: AppTextStyles.buttonPrimary.copyWith(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        // Sign In Button - Minimal
+                        return Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceCard,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.accentColor.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.lock_outline,
+                                color: AppColors.accentColor,
+                                size: 18,
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Sign in to post',
+                                      style: AppTextStyles.bodyMedium.copyWith(fontSize: 14),
+                                    ),
+                                    Text(
+                                      'Anonymous posting with your work account',
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: AppColors.textTertiary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: _isLoading ? null : _signInWithGoogle,
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: _isLoading
+                                        ? SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: AppColors.accentColor,
+                                            ),
+                                          )
+                                        : Image.asset(
+                                            'assets/google.png',
+                                            width: 24,
+                                            height: 24,
+                                          ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(width: AppSpacing.md),
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                            onTap: _isLoading ? null : _signInWithGoogle,
-                            child: Container(
-                              padding: EdgeInsets.all(AppSpacing.sm),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.15),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: _isLoading
-                                  ? SizedBox(
-                                      width: 36,
-                                      height: 36,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppColors.accentColor,
-                                      ),
-                                    )
-                                  : Image.asset(
-                                      'assets/google.png',
-                                      width: 36,
-                                      height: 36,
-                                    ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              },
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

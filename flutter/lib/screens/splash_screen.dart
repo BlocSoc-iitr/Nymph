@@ -61,16 +61,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.backgroundColor,
-              AppColors.cardBackgroundColor.withOpacity(0.5),
-            ],
-          ),
-        ),
         child: Center(
           child: AnimatedBuilder(
             animation: _animationController,
@@ -82,32 +72,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // App Icon
+                      // App Logo
                       Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: AppColors.accentColor,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.accentColor.withOpacity(0.3),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.security,
-                          color: Colors.black,
-                          size: 50,
+                        width: 80,
+                        height: 80,
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 32),
                       
                       // App Name
                       Text(
-                        'STEALTHNOTE',
+                        'NYMPH',
                         style: GoogleFonts.inter(
                           fontSize: 32,
                           fontWeight: FontWeight.w700,
@@ -128,17 +106,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         ),
                       ),
                       const SizedBox(height: 60),
-                      
-                      // Loading indicator
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: AppColors.accentColor,
-                          backgroundColor: AppColors.accentColor.withOpacity(0.1),
-                        ),
-                      ),
                     ],
                   ),
                 ),

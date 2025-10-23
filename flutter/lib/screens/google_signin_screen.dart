@@ -97,7 +97,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Signed in as: $userEmail'),
+              content: Text('Signed in successfully'),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -175,16 +175,6 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.backgroundColor,
-              AppColors.cardBackgroundColor.withOpacity(0.3),
-            ],
-          ),
-        ),
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -198,26 +188,14 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                   children: [
                     const Spacer(flex: 2),
                     
-                    // App Icon
+                    // App Logo
                     Center(
                       child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: AppColors.accentColor,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.accentColor.withOpacity(0.3),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.security,
-                          color: Colors.black,
-                          size: 50,
+                        width: 80,
+                        height: 80,
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
@@ -225,7 +203,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                     
                     // App Name
                     Text(
-                      'STEALTHNOTE',
+                      'Nymph',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 32,
@@ -265,17 +243,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                     
                     // Sign In Button
                     Container(
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
+                      height: 52,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _signInWithGoogle,
                         style: ElevatedButton.styleFrom(
@@ -283,7 +251,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                           foregroundColor: Colors.black,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
@@ -321,35 +289,16 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
                     
                     // Privacy note
                     Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.accentColor.withOpacity(0.2),
-                          width: 1,
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        'Your identity remains anonymous. Only your organization domain is visible.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondaryColor,
+                          height: 1.4,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.lock_outline,
-                            color: AppColors.accentColor,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Your identity remains anonymous. Only your organization domain is visible.',
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textSecondaryColor,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                     

@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -50,6 +52,81 @@ class _MessageCardState extends State<MessageCard> {
   int? _verifyingTimeMillis;
   bool _isLoading = false;
   bool? _verified; // null = not verified yet
+
+  // Generate a unique avatar seed for each message
+  String _generateAvatarSeed() {
+    // Use message ID + timestamp to create a unique seed
+    final seed = '${widget.msg.id}_${widget.msg.time.millisecondsSinceEpoch}';
+    return seed;
+  }
+
+  // Generate a random avatar URL using DiceBear API with unique seed
+  String _generateAnonymousAvatar() {
+    final seed = _generateAvatarSeed();
+    final random = Random(seed.hashCode);
+    
+    // List of different avatar styles for variety
+    final avatarStyles = [
+      'avataaars',
+      'bottts',
+      'identicon',
+      'personas',
+      'micah',
+      'adventurer',
+      'big-smile',
+      'croodles',
+      'fun-emoji',
+      'icons',
+      'lorelei',
+      'notionists',
+      'open-peeps',
+      'pixel-art',
+      'rings',
+      'shapes',
+      'thumbs'
+    ];
+    
+    // Select a random style based on the seed
+    final style = avatarStyles[random.nextInt(avatarStyles.length)];
+    
+    // Generate random parameters for more variety
+    final backgroundColor = random.nextInt(0xFFFFFF);
+    final accessoriesProbability = random.nextInt(100);
+    final facialHairProbability = random.nextInt(100);
+    final clothingProbability = random.nextInt(100);
+    
+    return 'https://api.dicebear.com/7.x/$style/png?seed=${Uri.encodeComponent(seed)}&backgroundColor=${backgroundColor.toRadixString(16).padLeft(6, '0')}&accessoriesProbability=$accessoriesProbability&facialHairProbability=$facialHairProbability&clothingProbability=$clothingProbability&size=80';
+  }
+
+  // Generate a unique background color for internal cards
+  Color _generateUniqueBackgroundColor() {
+    if (!widget.msg.internal) {
+      return AppColors.cardElevated; // Use default color for public cards
+    }
+    
+    final seed = _generateAvatarSeed();
+    final random = Random(seed.hashCode);
+    
+    // Generate RGB values (1-256, but we'll use 0-255 for Color)
+    final r = random.nextInt(256);
+    final g = random.nextInt(256);
+    final b = random.nextInt(256);
+    
+    // Ensure the color is not too light (to maintain text readability)
+    // If the color is too light, darken it
+    final brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+    if (brightness > 180) {
+      // Darken the color if it's too light
+      return Color.fromRGBO(
+        (r * 0.7).round().clamp(0, 255),
+        (g * 0.7).round().clamp(0, 255),
+        (b * 0.7).round().clamp(0, 255),
+        0.9, // Slight transparency
+      );
+    }
+    
+    return Color.fromRGBO(r, g, b, 0.9); // Slight transparency for better text readability
+  }
 
   @override
   void initState() {
@@ -162,56 +239,87 @@ class _MessageCardState extends State<MessageCard> {
     return Container(
       margin: EdgeInsets.only(bottom: AppSpacing.base),
       decoration: BoxDecoration(
-        color: AppColors.cardElevated,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        color: _generateUniqueBackgroundColor(),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.05),
+          color: widget.msg.internal 
+              ? Colors.white.withOpacity(0.2) 
+              : Colors.white.withOpacity(0.08),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: widget.msg.internal 
+                ? Colors.black.withOpacity(0.25)
+                : Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.cardPadding),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header row with org and time
+            // Header - Compact
             Row(
               children: [
+                // Anonymous User Avatar - Unique per message
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     color: AppColors.surfaceCard,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: AppColors.accentColor.withOpacity(0.2),
+                      color: AppColors.accentColor.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(18),
                     child: Image.network(
-                      // Deterministic anonymous avatar per org using DiceBear
-                      "https://api.dicebear.com/7.x/bottts/png?seed=${Uri.encodeComponent(widget.msg.org)}&backgroundType=gradientLinear&size=80",
-                      width: 40,
-                      height: 40,
+                      _generateAnonymousAvatar(),
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.person,
-                        size: 20,
-                        color: AppColors.textTertiary,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceCard,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Center(
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.accentColor,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: AppColors.accentColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          size: 18,
+                          color: AppColors.accentColor,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: AppSpacing.md),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,124 +327,164 @@ class _MessageCardState extends State<MessageCard> {
                       Text(
                         'Someone from ${widget.msg.org}',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimaryColor,
+                          color: widget.msg.internal 
+                              ? Colors.white 
+                              : AppColors.textPrimaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
                         ),
                       ),
-                      SizedBox(height: 2),
                       Text(
                         timeago.format(widget.msg.time),
                         style: AppTextStyles.small.copyWith(
-                          color: AppColors.textTertiary,
+                          color: widget.msg.internal 
+                              ? Colors.white.withOpacity(0.8) 
+                              : AppColors.textTertiary,
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
                 ),
-                // Verification badge
+                // Verification Status - Minimal
                 if (_verified != null)
                   Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs / 2,
-                    ),
+                    width: 24,
+                    height: 24,
                     decoration: BoxDecoration(
                       color: _verified!
-                          ? AppColors.success.withOpacity(0.1)
-                          : AppColors.error.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                      border: Border.all(
-                        color: _verified!
-                            ? AppColors.success.withOpacity(0.3)
-                            : AppColors.error.withOpacity(0.3),
-                        width: 1,
-                      ),
+                          ? AppColors.success.withOpacity(0.15)
+                          : AppColors.error.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _verified! ? Icons.verified : Icons.error_outline,
-                          size: 12,
-                          color: _verified! ? AppColors.success : AppColors.error,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          _verified! ? 'Verified' : 'Failed',
-                          style: AppTextStyles.small.copyWith(
-                            color: _verified! ? AppColors.success : AppColors.error,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
+                    child: Icon(
+                      _verified! ? Icons.check_circle : Icons.check_circle_outline,
+                      size: 16,
+                      color: _verified! ? AppColors.success : AppColors.error,
                     ),
                   ),
               ],
             ),
-            SizedBox(height: AppSpacing.md),
+            SizedBox(height: 12),
             
-            // Message body
+            // Message Text - Flexible height
             MarkdownBody(
               data: widget.msg.body,
               styleSheet: MarkdownStyleSheet(
-                p: AppTextStyles.body,
+                p: AppTextStyles.body.copyWith(
+                  fontSize: 15,
+                  height: 1.4,
+                  color: widget.msg.internal 
+                      ? Colors.white.withOpacity(0.95) 
+                      : AppColors.textPrimaryColor,
+                ),
                 a: AppTextStyles.body.copyWith(
-                  color: AppColors.accentColor,
+                  color: widget.msg.internal 
+                      ? AppColors.accentColor.withOpacity(0.9)
+                      : AppColors.accentColor,
                   decoration: TextDecoration.underline,
+                  fontSize: 15,
                 ),
                 code: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondaryColor,
-                  backgroundColor: AppColors.surfaceCard,
+                  color: widget.msg.internal 
+                      ? Colors.white.withOpacity(0.9)
+                      : AppColors.textSecondaryColor,
+                  backgroundColor: widget.msg.internal 
+                      ? Colors.black.withOpacity(0.2)
+                      : AppColors.surfaceCard,
+                  fontSize: 13,
                 ),
                 img: AppTextStyles.body,
               ),
               imageBuilder: (uri, title, alt) {
+                print('Loading image: ${uri.toString()}'); // Debug log
+                
+                // Validate URL
+                if (uri.toString().isEmpty || 
+                    (!uri.toString().startsWith('http://') && 
+                     !uri.toString().startsWith('https://'))) {
+                  print('Invalid image URL: ${uri.toString()}');
+                  return Container(
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceCard,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: AppColors.accentColor.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported_outlined,
+                            color: AppColors.textSecondaryColor,
+                            size: 24,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Invalid URL',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.textSecondaryColor,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
                       ),
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     child: Image.network(
                       uri.toString(),
                       fit: BoxFit.cover,
+                      headers: {
+                        'User-Agent': 'Mozilla/5.0 (compatible; StealthNote/1.0)',
+                        'Accept': 'image/*',
+                      },
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Container(
-                          height: 200,
+                          height: 120,
                           decoration: BoxDecoration(
                             color: AppColors.surfaceCard,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.accentColor,
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
+                                CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.accentColor,
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 Text(
                                   'Loading image...',
                                   style: AppTextStyles.caption.copyWith(
                                     color: AppColors.textSecondaryColor,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ],
@@ -345,11 +493,13 @@ class _MessageCardState extends State<MessageCard> {
                         );
                       },
                       errorBuilder: (context, error, stackTrace) {
+                        print('Image load error: $error for URL: ${uri.toString()}'); // Debug log
+                        print('Stack trace: $stackTrace'); // More detailed error info
                         return Container(
-                          height: 120,
+                          height: 80,
                           decoration: BoxDecoration(
                             color: AppColors.surfaceCard,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: AppColors.accentColor.withOpacity(0.2),
                               width: 1,
@@ -362,26 +512,16 @@ class _MessageCardState extends State<MessageCard> {
                                 Icon(
                                   Icons.broken_image_outlined,
                                   color: AppColors.textSecondaryColor,
-                                  size: 32,
+                                  size: 24,
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 4),
                                 Text(
-                                  alt ?? 'Failed to load image',
+                                  'Failed to load',
                                   style: AppTextStyles.caption.copyWith(
                                     color: AppColors.textSecondaryColor,
+                                    fontSize: 10,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
-                                if (title != null) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    title,
-                                    style: AppTextStyles.small.copyWith(
-                                      color: AppColors.textTertiary,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
                               ],
                             ),
                           ),
@@ -391,24 +531,20 @@ class _MessageCardState extends State<MessageCard> {
                   ),
                 );
               },
+              onTapLink: (text, href, title) {
+                print('Link tapped: $href'); // Debug log
+              },
             ),
-            SizedBox(height: AppSpacing.md),
+            SizedBox(height: 12),
             
-            // Divider
-            Container(
-              height: 1,
-              color: Colors.white.withOpacity(0.05),
-            ),
-            SizedBox(height: AppSpacing.md),
-            
-            // Footer with actions
+            // Bottom Actions - Compact
             Row(
               children: [
-                // Like button
+                // Like Button - Minimal
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    borderRadius: BorderRadius.circular(20),
                     onTap: () async {
                       if (widget.msg.isLiked == 0) {
                         await toggleLike(widget.msg.id, true);
@@ -426,81 +562,115 @@ class _MessageCardState extends State<MessageCard> {
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: widget.msg.isLiked == 1
+                            ? AppColors.accentColor.withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             widget.msg.isLiked == 1
-                                ? Icons.thumb_up
-                                : Icons.thumb_up_outlined,
-                            size: 18,
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 16,
                             color: widget.msg.isLiked == 1
                                 ? AppColors.accentColor
-                                : AppColors.textSecondaryColor,
+                                : widget.msg.internal 
+                                    ? Colors.white.withOpacity(0.8)
+                                    : AppColors.textSecondaryColor,
                           ),
-                          SizedBox(width: AppSpacing.xs),
-                          Text(
-                            widget.msg.likes.toString(),
-                            style: AppTextStyles.caption.copyWith(
-                              color: widget.msg.isLiked == 1
-                                  ? AppColors.accentColor
-                                  : AppColors.textSecondaryColor,
-                              fontWeight: FontWeight.w600,
+                          if (widget.msg.likes > 0) ...[
+                            SizedBox(width: 4),
+                            Text(
+                              widget.msg.likes.toString(),
+                              style: AppTextStyles.caption.copyWith(
+                                color: widget.msg.isLiked == 1
+                                    ? AppColors.accentColor
+                                    : widget.msg.internal 
+                                        ? Colors.white.withOpacity(0.8)
+                                        : AppColors.textSecondaryColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
                   ),
                 ),
-                const Spacer(),
                 
-                // Verify button
+                Spacer(),
+                
+                // Verify Button - Only show if not verified
                 if (_verified == null)
-                  ElevatedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => _callVerifyJwtProof(
-                              widget.msg.id,
-                              widget.msg.internal,
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: _isLoading
+                          ? null
+                          : () => _callVerifyJwtProof(
+                                widget.msg.id,
+                                widget.msg.internal,
+                              ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                          decoration: BoxDecoration(
+                            color: widget.msg.internal 
+                                ? Colors.white.withOpacity(0.15)
+                                : AppColors.surfaceCard,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: widget.msg.internal 
+                                  ? Colors.white.withOpacity(0.4)
+                                  : AppColors.accentColor.withOpacity(0.3),
+                              width: 1,
                             ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.surfaceCard,
-                      foregroundColor: AppColors.accentColor,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppSpacing.base,
-                        vertical: AppSpacing.xs,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          ),
+                        child: _isLoading
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.accentColor,
+                                ),
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                    Icon(
+                                      Icons.shield_outlined,
+                                      size: 14,
+                                      color: widget.msg.internal 
+                                          ? Colors.white
+                                          : AppColors.accentColor,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Verify',
+                                      style: AppTextStyles.caption.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: widget.msg.internal 
+                                            ? Colors.white
+                                            : AppColors.accentColor,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                ],
+                              ),
                       ),
                     ),
-                    child: _isLoading
-                        ? SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.accentColor,
-                            ),
-                          )
-                        : Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.shield_outlined, size: 16),
-                              SizedBox(width: AppSpacing.xs),
-                              Text(
-                                'Verify',
-                                style: AppTextStyles.caption.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
                   ),
               ],
             ),
