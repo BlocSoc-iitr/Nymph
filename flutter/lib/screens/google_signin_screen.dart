@@ -97,7 +97,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> with SingleTick
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Signed in as: $userEmail'),
+              content: Text('Signed in successfully'),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

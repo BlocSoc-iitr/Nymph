@@ -85,7 +85,7 @@ class _SignInCardState extends State<SignInCard> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Signed in as: $userEmail'),
+              content: Text('Signed in successfully'),
               backgroundColor: Colors.green,
             ),
           );
