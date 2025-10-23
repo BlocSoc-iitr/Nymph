@@ -6,7 +6,7 @@ class AppColors {
   static const Color accentColorDark = Color(0xFF00B8D4);
 
   // Background Colors
-  static const Color backgroundColor = Color(0xFF0A0A0A);
+  static const Color backgroundColor = Color(0xFF050505); // Darker background
   static const Color cardBackgroundColor = Color(0xFF1A1A1A);
   static const Color cardElevated = Color(0xFF252525);
 
